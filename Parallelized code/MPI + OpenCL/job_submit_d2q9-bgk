@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#SBATCH --job-name d2q9-bgk
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node 2
+#SBATCH --gres=gpu:2
+#SBATCH --time 00:01:30
+#SBATCH --partition gpu_veryshort
+
+module load CUDA/8.0.44
+module use /mnt/storage/scratch/jp8463/modules/modulefiles
+module load clang-ykt/2017-07-24
+module load iimpi/2017.01-GCC-5.4.0-2.26
+
+
+echo Running on host `hostname`
+echo Time is `date`
+echo Directory is `pwd`
+echo Slurm job ID is $SLURM_JOB_ID
+echo This job runs on the following machines:
+echo `echo $SLURM_JOB_NODELIST | uniq`
+
+
+#! Run the executable
+time mpirun -ppn 1 -np 1 -env OCL_DEVICE=1 ./d2q9-bgk input_1024x1024.params obstacles_1024x1024.dat : -np 1 -env OCL_DEVICE=2 ./d2q9-bgk input_1024x1024.params obstacles_1024x1024.dat :  -np 1 -env OCL_DEVICE=1 ./d2q9-bgk input_1024x1024.params obstacles_1024x1024.dat : -np 1 -env OCL_DEVICE=2 ./d2q9-bgk input_1024x1024.params obstacles_1024x1024.dat
